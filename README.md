@@ -1,4 +1,8 @@
-webgl_music_visualizer
-======================
+Advanced Graphics Homework
+===============
 
-A music visualizer built in webgl.  A project for my advanced graphics class
+Fun Particles
+
+
+
+use arrow keys to rotate through the space
