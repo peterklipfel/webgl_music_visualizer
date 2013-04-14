@@ -8,6 +8,7 @@
 <script type="text/javascript" src="lib/glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="lib/webgl-utils.js"></script>
 <script type="text/javascript" src="lib/jquery.min.js"></script>
+<script type="text/javascript" src="lib/stats.min.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -42,6 +43,7 @@
 
 <script type="text/javascript">
 
+    var stats;
     var gl;
 
     function initGL(canvas) {
@@ -438,6 +440,7 @@
         handleKeys();
         drawScene();
         animate();
+        stats.update();
     }
 
     var analyser, canvas, canvasContext;
@@ -499,6 +502,13 @@
         
         setTimeout(function(){startWebAudio(); $('#music').trigger("play"); console.log('started');}, 3000);
         
+        stats = new Stats();
+        stats.setMode(1);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+        document.body.appendChild( stats.domElement );
+
         tick();
     }
 </script>
