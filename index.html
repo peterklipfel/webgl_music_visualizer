@@ -411,7 +411,8 @@
         //     amplitude = amplitude + freqByteData[i];
         // }
         // amplitude = amplitude/(freqByteData.length*256);
-        if (freqByteData[512] > 200){
+        console.log("here");
+        if (freqByteData[512] > 150){
             console.log(freqByteData[512]);
         }
         if (lastTime != 0) {
@@ -484,8 +485,6 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         setTrack();
-        
-        startWebAudio();
 
         initGL(canvas);
         initShaders();
@@ -498,7 +497,7 @@
         document.onkeydown = handleKeyDown;
         document.onkeyup = handleKeyUp;
         
-        setTimeout(function(){$('#music').trigger("play"); console.log('started');}, 3000);
+        setTimeout(function(){startWebAudio(); $('#music').trigger("play"); console.log('started');}, 3000);
         
         
         tick();
