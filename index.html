@@ -7,6 +7,7 @@
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -366,7 +367,7 @@
     var stars = [];
 
     function initWorldObjects() {
-        var numStars = 1000;
+        var numStars = 1024;
 
         stars.push(new Star((3 / numStars) * 5.0, 0));
 
@@ -410,18 +411,20 @@
         //     amplitude = amplitude + freqByteData[i];
         // }
         // amplitude = amplitude/(freqByteData.length*256);
-
+        if (freqByteData[512] > 200){
+            console.log(freqByteData[512]);
+        }
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
             for (var i in stars) {
                 stars[i].animate(elapsed);
-                stars[i].r = freqByteData[i%freqByteData.length]/512;
-                stars[i].g = 0; //freqByteData[i]/256;
-                stars[i].b = 0; //freqByteData[i]/256;
-                stars[i].twinkleR = freqByteData[i%freqByteData.length]/512;
-                stars[i].twinkleG = 0; //freqByteData[i]/256;
-                stars[i].twinkleB = 0; //freqByteData[i]/256;
+                stars[i].r = freqByteData[i%256]/1024;
+                stars[i].g = freqByteData[i%256+256]/1024;
+                stars[i].b = freqByteData[i%256+512]/1024;
+                stars[i].twinkleR = freqByteData[i%256]/1024;
+                stars[i].twinkleG = freqByteData[i%256+256]/1024;
+                stars[i].twinkleB = freqByteData[i%256+512]/1024;
             }
         }
         lastTime = timeNow;
@@ -457,11 +460,30 @@
         audio.play();
     }
 
+    function setTrack() {
+         $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
+        function(data) {
+            var download_url = "";
+            var tracks = $($(data).context.firstChild).find("track");
+            // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
+            for (var i = tracks.length - 1; i >= 0; i--) {
+                if($(tracks[i]).find("downloadable").text() == "true"){
+                    console.log("downloadable? " + $(tracks[i]).find("downloadable").text());
+                    download_url = $(tracks[i]).find("download-url").text();
+                    console.log(download_url);
+                    $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
+                    break;
+                }
+            };
+        });
+    }
+
 
     function webGLStart() {
         var canvas = document.getElementById("lesson09-canvas");
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        setTrack();
         
         startWebAudio();
 
@@ -475,17 +497,19 @@
 
         document.onkeydown = handleKeyDown;
         document.onkeyup = handleKeyUp;
-
+        
+        setTimeout(function(){$('#music').trigger("play"); console.log('started');}, 3000);
+        
+        
         tick();
     }
-
 </script>
 
 
 </head>
 <body onload="webGLStart();" style="margin: 0; overflow: hidden;">
     <canvas id="lesson09-canvas" style="margin: 0; overflow: hidden;"></canvas>
-    <audio id="music" src="https://soundcloud.com/glitchhop/playground-by-speo/download" preload="auto"></audio>
+    <audio id="music" src="" preload="auto"></audio>
 </body>
 
 </html>
