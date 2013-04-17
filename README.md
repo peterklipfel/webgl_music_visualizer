@@ -1,6 +1,8 @@
 WebGL Soundcloud Music Visualizer
 ===============
 
+YOU MUST BE CONNECTED TO THE INTERNET!
+
 The particles are assigned to independent frequencies, and respond to the amplitude of that particular frequency.  All the music is pulled from the most recently uploaded tracks from soundcloud
 
 
