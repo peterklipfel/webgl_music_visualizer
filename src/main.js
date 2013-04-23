@@ -361,13 +361,18 @@ var lastTime = 0;
 function animate() {
     var timeNow = new Date().getTime();
     var freqByteData = new Uint8Array(analyser.frequencyBinCount);
+    var amplitude = 0;
     // var amplitude = 0;
     // Copy the frequency data into our new array
     analyser.getByteFrequencyData(freqByteData);
-    // for (var i = 0; i < freqByteData.length; i++) {
-    //     amplitude = amplitude + freqByteData[i];
-    // }
-    // amplitude = amplitude/(freqByteData.length*256);
+    // analyser.getByteTimeDomainData(amplitude);
+    for (var i = 0; i < freqByteData.length; i++) {
+        amplitude = amplitude + freqByteData[i];
+    }
+    amplitude = amplitude/freqByteData.length
+    if(amplitude > 127){
+        console.log(amplitude);
+    }
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
 

@@ -10,10 +10,35 @@
 <script type="text/javascript" src="lib/jquery.min.js"></script>
 <script type="text/javascript" src="lib/stats.min.js"></script>
 
-<script id="shader-fs" type="x-shader/x-fragment" src="src/fragment-shader.js"></script>
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision mediump float;
 
-<script id="shader-vs" type="x-shader/x-vertex" src="src/vertex-shader.js"></script>
+    varying vec2 vTextureCoord;
 
+    uniform sampler2D uSampler;
+
+    uniform vec3 uColor;
+
+    void main(void) {
+        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = textureColor * vec4(uColor, 1.0);
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec2 vTextureCoord;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+    }
+</script>
 
 <script type="text/javascript" src="src/main.js"></script>
 
