@@ -139,7 +139,8 @@ function initTextureFrameBuffer() {
 
     rttTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, rttTexture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -297,7 +298,7 @@ function initBuffers() {
 
     screenVertexTextureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
-    var textureCoords = [
+    textureCoords = [
         // Front face
         // 0.0, 0.0,
         // 1.0, 0.0,
@@ -315,16 +316,6 @@ function initBuffers() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
     screenVertexTextureCoordBuffer.itemSize = 2;
     screenVertexTextureCoordBuffer.numItems = 6;
-
-    screenVertexIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, screenVertexIndexBuffer);
-    var screenVertexIndices = [
-        // 0, 1, 2,      2, 1, 5    // Front face
-        0, 1, 2,      0, 1, 2,    // Front face
-    ];
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(screenVertexIndices), gl.STATIC_DRAW);
-    screenVertexIndexBuffer.itemSize = 1;
-    screenVertexIndexBuffer.numItems = 6;
 }
 
 
@@ -504,8 +495,9 @@ function tick() {
     requestAnimFrame(tick);
     handleKeys();
     drawScene();
-
+    
     gl.useProgram(shaderToScreenProgram);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.bindTexture(gl.TEXTURE_2D, rttTexture);
     gl.uniform1i(shaderToScreenProgram.samplerUniform, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
@@ -516,7 +508,7 @@ function tick() {
 
     gl.drawArrays(gl.TRIANGLES, 0, screenVertexPositionBuffer.numItems);
     // gl.drawElements(gl.TRIANGLES, screenVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-    
+
     animate();
     stats.update();
 }
