@@ -300,12 +300,6 @@ function initBuffers() {
     gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
     textureCoords = [
         // Front face
-        // 0.0, 0.0,
-        // 1.0, 0.0,
-        // 0.0, 1.0,
-        // 0.0, 1.0,
-        // 1.0, 0.0,
-        // 1.0, 1.0
         0.0, 0.0,
         1.0, 0.0,
         0.0, 1.0,
