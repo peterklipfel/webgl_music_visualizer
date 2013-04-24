@@ -77,6 +77,30 @@ function initShaders() {
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
     shaderProgram.colorUniform = gl.getUniformLocation(shaderProgram, "uColor");
+
+    // --------------------------------------------------------------------------------------------------
+    // -------------------------------------Screen Renderer----------------------------------------------
+    // --------------------------------------------------------------------------------------------------
+
+    fragmentShader = getShader(gl, "shader-fs-toscreen");
+    vertexShader = getShader(gl, "shader-vs-toscreen");
+    shaderToScreenProgram = gl.createProgram();
+    gl.attachShader(shaderToScreenProgram, vertexShader);
+    gl.attachShader(shaderToScreenProgram, fragmentShader);
+    gl.linkProgram(shaderToScreenProgram);
+
+    gl.useProgram(shaderToScreenProgram);
+
+    shaderToScreenProgram.vertexPositionAttribute = gl.getAttribLocation(shaderToScreenProgram, "aVertexPosition");
+    gl.enableVertexAttribArray(shaderToScreenProgram.vertexPositionAttribute);
+
+    shaderToScreenProgram.textureCoordAttribute = gl.getAttribLocation(shaderToScreenProgram, "aTextureCoord");
+    gl.enableVertexAttribArray(shaderToScreenProgram.textureCoordAttribute);
+
+    shaderToScreenProgram.pMatrixUniform = gl.getUniformLocation(shaderToScreenProgram, "uPMatrix");
+    shaderToScreenProgram.mvMatrixUniform = gl.getUniformLocation(shaderToScreenProgram, "uMVMatrix");
+    shaderToScreenProgram.samplerUniform = gl.getUniformLocation(shaderToScreenProgram, "uSamplerToScreen");
+    shaderToScreenProgram.colorUniform = gl.getUniformLocation(shaderToScreenProgram, "uColor");
 }
 
 
@@ -103,6 +127,36 @@ function initTexture() {
     starTexture.image.src = "assets/star.gif";
 }
 
+
+var rttFramebuffer;
+var rttTexture;
+
+function initTextureFrameBuffer() {
+    rttFramebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+    rttFramebuffer.width = window.innerWidth;
+    rttFramebuffer.height = window.innerHeight;
+
+    rttTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    var renderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rttFramebuffer.width, rttFramebuffer.height);
+
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
 
 var mvMatrix = mat4.create();
 var mvMatrixStack = [];
@@ -220,6 +274,57 @@ function initBuffers() {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(starVertexIndices), gl.STATIC_DRAW);
     starVertexIndexBuffer.itemSize = 1;
     starVertexIndexBuffer.numItems = 6;
+
+    //--------------------------------------------------------------------------------------------
+    //------------------------------Screen Render Buffers-----------------------------------------
+    //--------------------------------------------------------------------------------------------
+
+    screenVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexPositionBuffer);
+    vertices = [
+        // Front face
+        -1.0, -1.0,  0.0,
+         1.0, -1.0,  0.0,
+        -1.0,  1.0,  0.0,
+        -1.0,  1.0,  0.0,
+         1.0, -1.0,  0.0,
+         1.0,  1.0,  0.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    screenVertexPositionBuffer.itemSize = 3;
+    screenVertexPositionBuffer.numItems = 6;
+    screenVertexPositionBuffer.numItems = 6;
+
+    screenVertexTextureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
+    var textureCoords = [
+        // Front face
+        // 0.0, 0.0,
+        // 1.0, 0.0,
+        // 0.0, 1.0,
+        // 0.0, 1.0,
+        // 1.0, 0.0,
+        // 1.0, 1.0
+        0.0, 0.0,
+        1.0, 0.0,
+        0.0, 1.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+    screenVertexTextureCoordBuffer.itemSize = 2;
+    screenVertexTextureCoordBuffer.numItems = 6;
+
+    screenVertexIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, screenVertexIndexBuffer);
+    var screenVertexIndices = [
+        // 0, 1, 2,      2, 1, 5    // Front face
+        0, 1, 2,      0, 1, 2,    // Front face
+    ];
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(screenVertexIndices), gl.STATIC_DRAW);
+    screenVertexIndexBuffer.itemSize = 1;
+    screenVertexIndexBuffer.numItems = 6;
 }
 
 
@@ -335,6 +440,10 @@ function initWorldObjects() {
 
 
 function drawScene() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+
+    gl.useProgram(shaderProgram);
+
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -353,6 +462,10 @@ function drawScene() {
         spin += 0.5;
     }
 
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
+    setMatrixUniforms();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 }
 
 
@@ -362,17 +475,13 @@ function animate() {
     var timeNow = new Date().getTime();
     var freqByteData = new Uint8Array(analyser.frequencyBinCount);
     var amplitude = 0;
-    // var amplitude = 0;
     // Copy the frequency data into our new array
     analyser.getByteFrequencyData(freqByteData);
     // analyser.getByteTimeDomainData(amplitude);
     for (var i = 0; i < freqByteData.length; i++) {
         amplitude = amplitude + freqByteData[i];
     }
-    amplitude = amplitude/freqByteData.length
-    if(amplitude > 127){
-        console.log(amplitude);
-    }
+    amplitude = (amplitude/freqByteData.length)/150.0
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
 
@@ -395,6 +504,19 @@ function tick() {
     requestAnimFrame(tick);
     handleKeys();
     drawScene();
+
+    gl.useProgram(shaderToScreenProgram);
+    gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+    gl.uniform1i(shaderToScreenProgram.samplerUniform, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderToScreenProgram.textureCoordAttribute, screenVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderToScreenProgram.vertexPositionAttribute, screenVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, screenVertexPositionBuffer.numItems);
+    // gl.drawElements(gl.TRIANGLES, screenVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    
     animate();
     stats.update();
 }
@@ -446,6 +568,7 @@ function webGLStart() {
     setTrack();
 
     initGL(canvas);
+    initTextureFrameBuffer();
     initShaders();
     initBuffers();
     initTexture();
