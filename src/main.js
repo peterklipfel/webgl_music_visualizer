@@ -539,21 +539,20 @@ function startWebAudio() {
 }
 
 function setTrack() {
-    //  $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
-    // function(data) {
-    //     var download_url = "";
-    //     var tracks = $($(data).context.firstChild).find("track");
-    //     // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
-    //     for (var i = tracks.length - 1; i >= 0; i--) {
-    //         if($(tracks[i]).find("downloadable").text() == "true"){
-    //             console.log("downloadable? " + $(tracks[i]).find("downloadable").text());
-    //             download_url = $(tracks[i]).find("download-url").text();
-    //             console.log(download_url);
-    //             $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
-    //             break;
-    //         }
-    //     };
-    // });
+     $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
+    function(data) {
+        var download_url = "";
+        var tracks = $($(data).context.firstChild).find("track");
+        // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
+        for (var i = tracks.length - 1; i >= 0; i--) {
+            if($(tracks[i]).find("downloadable").text() == "true"){
+                $("#songTitle").text($(tracks[i]).find("title").text());
+                download_url = $(tracks[i]).find("download-url").text();
+                $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
+                break;
+            }
+        };
+    });
 }
 
 
