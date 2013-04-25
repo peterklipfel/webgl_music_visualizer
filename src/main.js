@@ -100,7 +100,7 @@ function initShaders() {
     shaderToScreenProgram.pMatrixUniform = gl.getUniformLocation(shaderToScreenProgram, "uPMatrix");
     shaderToScreenProgram.mvMatrixUniform = gl.getUniformLocation(shaderToScreenProgram, "uMVMatrix");
     shaderToScreenProgram.samplerUniform = gl.getUniformLocation(shaderToScreenProgram, "uSamplerToScreen");
-    shaderToScreenProgram.colorUniform = gl.getUniformLocation(shaderToScreenProgram, "uColor");
+    shaderToScreenProgram.amplitudeUniform = gl.getUniformLocation(shaderToScreenProgram, "uAmplitude");
 }
 
 
@@ -139,8 +139,6 @@ function initTextureFrameBuffer() {
 
     rttTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, rttTexture);
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -211,11 +209,11 @@ var th = 0;
 function handleKeys() {
     if (currentlyPressedKeys[33]) {
         // Page Up
-        zoom -= 0.1;
+        zoom -= 0.5;
     }
     if (currentlyPressedKeys[34]) {
         // Page Down
-        zoom += 0.1;
+        zoom += 0.5;
     }
     if (currentlyPressedKeys[38]) {
         // Up cursor key
@@ -325,7 +323,6 @@ function drawStar() {
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, starVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms();
-    // gl.drawArrays(gl.TRIANGLE_STRIP, 0, starVertexPositionBuffer.numItems);
     gl.drawElements(gl.TRIANGLES, starVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
@@ -467,6 +464,7 @@ function animate() {
         amplitude = amplitude + freqByteData[i];
     }
     amplitude = (amplitude/freqByteData.length)/150.0
+    gl.uniform1f(shaderToScreenProgram.amplitudeUniform ,amplitude)
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
 
@@ -529,21 +527,21 @@ function startWebAudio() {
 }
 
 function setTrack() {
-     $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
-    function(data) {
-        var download_url = "";
-        var tracks = $($(data).context.firstChild).find("track");
-        // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
-        for (var i = tracks.length - 1; i >= 0; i--) {
-            if($(tracks[i]).find("downloadable").text() == "true"){
-                console.log("downloadable? " + $(tracks[i]).find("downloadable").text());
-                download_url = $(tracks[i]).find("download-url").text();
-                console.log(download_url);
-                $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
-                break;
-            }
-        };
-    });
+    //  $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
+    // function(data) {
+    //     var download_url = "";
+    //     var tracks = $($(data).context.firstChild).find("track");
+    //     // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
+    //     for (var i = tracks.length - 1; i >= 0; i--) {
+    //         if($(tracks[i]).find("downloadable").text() == "true"){
+    //             console.log("downloadable? " + $(tracks[i]).find("downloadable").text());
+    //             download_url = $(tracks[i]).find("download-url").text();
+    //             console.log(download_url);
+    //             $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
+    //             break;
+    //         }
+    //     };
+    // });
 }
 
 

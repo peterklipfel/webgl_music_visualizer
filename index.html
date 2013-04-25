@@ -47,22 +47,43 @@
 
     uniform sampler2D uSamplerToScreen;
 
-    uniform vec3 uColor;
+    uniform float uAmplitude;
+
+    varying vec2 vUv;
+
+    vec4 sample(float dx,float dy)
+    {
+        return texture2D(uSamplerToScreen, vec2(vTextureCoord.s, vTextureCoord.t));
+    }
 
     void main(void) {
         vec4 textureColor = texture2D(uSamplerToScreen, vec2(vTextureCoord.s, vTextureCoord.t));
-        gl_FragColor = textureColor;// * vec4(uColor, 1.0);
-        // gl_FragColor = vec4(vTextureCoord.s, vTextureCoord.t, 0.0, 1.0);
+        vec3 rgb = textureColor.rgb;
+        // gl_FragColor = textureColor;
+        // gl_FragColor = vec4(uAmplitude, uAmplitude, 0.0, 1.0);
 
-    }
+        // Saturation Filter
+        float r, g, b;
+        r = rgb.r;
+        g = rgb.g;
+        b = rgb.b;
+        if(rgb.r < 0.6){
+          r = 0.0;
+        }
+        if(rgb.g < 0.6){
+          g = 0.0;
+        }
+        if(rgb.b < 0.6){
+          b = 0.0;
+        }
+
+        gl_FragColor = vec4(r, g, b, 1.0);
+      }
 </script>
 
 <script id="shader-vs-toscreen" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
     attribute vec2 aTextureCoord;
-
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
 
     varying vec2 vTextureCoord;
 
@@ -75,10 +96,13 @@
 
 <script type="text/javascript" src="src/main.js"></script>
 
+<link rel="stylesheet" href="src/styles.css">
+
 </head>
-<body onload="webGLStart();" style="margin: 0; overflow: hidden;">
-    <canvas id="visualizer" style="margin: 0; overflow: hidden;"></canvas>
-    <audio id="music" src="" preload="auto"></audio>
+<body onload="webGLStart();">
+    <div id="sidebar"><input type="range" id="range" min="0" max="1" step="0.01" value="0.4"/></div>
+    <canvas id="visualizer"></canvas>
+    <audio id="music" src="https://soundcloud.com/glitchhop/breakdown-by-sirensceol/download" preload="auto"></audio>
 </body>
 
 </html>
