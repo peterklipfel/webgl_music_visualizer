@@ -538,21 +538,33 @@ function startWebAudio() {
     audio.play();
 }
 
-function setTrack() {
-     $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true}, 
+var currentTrackNum = 0;
+
+function getTracks(){
+    $.get("http://api.soundcloud.com/tracks?client_id=4c6187aeda01c8ad86e556555621074f", {downloadable: true},
     function(data) {
         var download_url = "";
-        var tracks = $($(data).context.firstChild).find("track");
-        // console.log($($(data).context.firstChild).find("track").first().find("downloadable").text())
-        for (var i = tracks.length - 1; i >= 0; i--) {
-            if($(tracks[i]).find("downloadable").text() == "true"){
-                $("#songTitle").text($(tracks[i]).find("title").text());
-                download_url = $(tracks[i]).find("download-url").text();
-                $("#music").attr("src", download_url+"?client_id=4c6187aeda01c8ad86e556555621074f");
-                break;
+        var rawTracks = $($(data).context.firstChild).find("track");
+        var downloadableTracks = [];
+        for (var i = rawTracks.length - 1; i >= 0; i--) {
+            if($(rawTracks[i]).find("downloadable").text() == "true"){
+                var trackData = {}
+                trackData["title"] = $(rawTracks[i]).find("title").text();
+                trackData["download"] = $(rawTracks[i]).find("download-url").text();
+                downloadableTracks.push(trackData);
             }
         };
+        $('#tracks').data("tracks", downloadableTracks);
     });
+}
+
+function setTrack(trackNum) {
+    var tracks = $("#tracks").data("tracks")
+    var currentTrack = tracks[parseInt(trackNum)%tracks.length];
+    $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
+    console.log(currentTrack["download"]);
+    $("#songTitle").text(currentTrack["title"]);
+    setTimeout(function(){startWebAudio(); $('#music').trigger("play");}, 4000)
 }
 
 
@@ -560,7 +572,8 @@ function webGLStart() {
     var canvas = document.getElementById("visualizer");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    setTrack();
+    getTracks();
+    setTimeout(function(){setTrack(0);}, 3000);
 
     initGL(canvas);
     initTextureFrameBuffer();
@@ -573,8 +586,6 @@ function webGLStart() {
 
     document.onkeydown = handleKeyDown;
     document.onkeyup = handleKeyUp;
-    
-    setTimeout(function(){startWebAudio(); $('#music').trigger("play"); console.log('started');}, 3000);
     
     stats = new Stats();
     stats.setMode(1);

@@ -30,7 +30,7 @@ body{
 }
 
 .hideable{
-	background-color: rgba(30,30,30,1);
+	background-color: rgba(80,80,80,0.35);
 	-webkit-border-radius: 15px;
     border-radius: 15px;
 }
