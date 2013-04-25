@@ -330,6 +330,27 @@ function drawStar() {
 }
 
 
+function renderBufferToScreen() {
+    gl.useProgram(shaderToScreenProgram);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+    gl.uniform1i(shaderToScreenProgram.samplerUniform, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(shaderToScreenProgram.textureCoordAttribute, screenVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderToScreenProgram.vertexPositionAttribute, screenVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, screenVertexPositionBuffer.numItems);
+}
+
+function bindSettings() {
+    gl.uniform1f(shaderToScreenProgram.rSensUniform ,$('#rSens').val()/100);
+    gl.uniform1f(shaderToScreenProgram.gSensUniform ,$('#gSens').val()/100);
+    gl.uniform1f(shaderToScreenProgram.bSensUniform ,$('#bSens').val()/100);
+}
+
+
 
 function Star(velocity, rotationSpeed) {
     this.angle = 0;
@@ -490,24 +511,8 @@ function tick() {
     requestAnimFrame(tick);
     handleKeys();
     drawScene();
-    
-    gl.useProgram(shaderToScreenProgram);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.bindTexture(gl.TEXTURE_2D, rttTexture);
-    gl.uniform1i(shaderToScreenProgram.samplerUniform, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexTextureCoordBuffer);
-    gl.vertexAttribPointer(shaderToScreenProgram.textureCoordAttribute, screenVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, screenVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderToScreenProgram.vertexPositionAttribute, screenVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.drawArrays(gl.TRIANGLES, 0, screenVertexPositionBuffer.numItems);
-    // gl.drawElements(gl.TRIANGLES, screenVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
-    gl.uniform1f(shaderToScreenProgram.rSensUniform ,$('#rSens').val()/100);
-    gl.uniform1f(shaderToScreenProgram.gSensUniform ,$('#gSens').val()/100);
-    gl.uniform1f(shaderToScreenProgram.bSensUniform ,$('#bSens').val()/100);
-    
+    renderBufferToScreen();
+    bindSettings();
     animate();
     stats.update();
 }
