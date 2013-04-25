@@ -101,6 +101,9 @@ function initShaders() {
     shaderToScreenProgram.mvMatrixUniform = gl.getUniformLocation(shaderToScreenProgram, "uMVMatrix");
     shaderToScreenProgram.samplerUniform = gl.getUniformLocation(shaderToScreenProgram, "uSamplerToScreen");
     shaderToScreenProgram.amplitudeUniform = gl.getUniformLocation(shaderToScreenProgram, "uAmplitude");
+    shaderToScreenProgram.rSensUniform = gl.getUniformLocation(shaderToScreenProgram, "uRedSensitivity");
+    shaderToScreenProgram.gSensUniform = gl.getUniformLocation(shaderToScreenProgram, "uGreenSensitivity");
+    shaderToScreenProgram.bSensUniform = gl.getUniformLocation(shaderToScreenProgram, "uBlueSensitivity");
 }
 
 
@@ -501,6 +504,10 @@ function tick() {
     gl.drawArrays(gl.TRIANGLES, 0, screenVertexPositionBuffer.numItems);
     // gl.drawElements(gl.TRIANGLES, screenVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
+    gl.uniform1f(shaderToScreenProgram.rSensUniform ,$('#rSens').val()/100);
+    gl.uniform1f(shaderToScreenProgram.gSensUniform ,$('#gSens').val()/100);
+    gl.uniform1f(shaderToScreenProgram.bSensUniform ,$('#bSens').val()/100);
+    
     animate();
     stats.update();
 }

@@ -12,11 +12,11 @@ body{
 #sidebar{
 	z-index:999; 
 	position:absolute;
-	float: right;
+	right: 0;
+	top: 30%;
 }
 
-/*#range{
-	-webkit-appearance: slider-vertical; 
-	width: 20px; 
-	height: 100px;
-}*/
+h5{
+	color: #ddd;
+	font-family: Helvetica;
+}

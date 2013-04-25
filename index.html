@@ -49,6 +49,9 @@
     uniform sampler2D uSamplerToScreen;
 
     uniform float uAmplitude;
+    uniform float uRedSensitivity;
+    uniform float uGreenSensitivity;
+    uniform float uBlueSensitivity;
 
     varying vec2 vUv;
 
@@ -68,13 +71,13 @@
         r = rgb.r;
         g = rgb.g;
         b = rgb.b;
-        if(rgb.r < 0.6){
+        if(rgb.r < uRedSensitivity){
           r = 0.0;
         }
-        if(rgb.g < 0.6){
+        if(rgb.g < uGreenSensitivity){
           g = 0.0;
         }
-        if(rgb.b < 0.6){
+        if(rgb.b < uBlueSensitivity){
           b = 0.0;
         }
 
@@ -103,7 +106,18 @@
 </head>
 <body onload="webGLStart();">
     <div id="sidebar">
-        <input type="text" class="dial" id="range" data-min="0" data-max="100" value="40"/>
+        <div>
+            <h5>Red Sensitivity</h5>
+            <input type="text" class="dial" id="rSens" data-min="0" data-max="100" value="40"/>
+        </div>
+        <div>
+            <h5>Green Sensitivity</h5>
+            <input type="text" class="dial" id="gSens" data-min="0" data-max="100" value="40"/>
+        </div>
+        <div>
+            <h5>Blue Sensitivity</h5>
+            <input type="text" class="dial" id="bSens" data-min="0" data-max="100" value="40"/>
+        </div>
     </div>
     <canvas id="visualizer"></canvas>
     <audio id="music" src="https://soundcloud.com/nickraymondg/miguel-do-you-cashmere-cat/download" preload="auto"></audio>
