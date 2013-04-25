@@ -9,6 +9,7 @@
 <script type="text/javascript" src="lib/webgl-utils.js"></script>
 <script type="text/javascript" src="lib/jquery.min.js"></script>
 <script type="text/javascript" src="lib/stats.min.js"></script>
+<script type="text/javascript" src="lib/jquery.knob.min.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -93,6 +94,7 @@
     }
 </script>
 
+<script type="text/javascript" src="src/settings.js"></script>
 
 <script type="text/javascript" src="src/main.js"></script>
 
@@ -100,9 +102,11 @@
 
 </head>
 <body onload="webGLStart();">
-    <div id="sidebar"><input type="range" id="range" min="0" max="1" step="0.01" value="0.4"/></div>
+    <div id="sidebar">
+        <input type="text" class="dial" id="range" data-min="0" data-max="100" value="40"/>
+    </div>
     <canvas id="visualizer"></canvas>
-    <audio id="music" src="https://soundcloud.com/glitchhop/breakdown-by-sirensceol/download" preload="auto"></audio>
+    <audio id="music" src="https://soundcloud.com/nickraymondg/miguel-do-you-cashmere-cat/download" preload="auto"></audio>
 </body>
 
 </html>
