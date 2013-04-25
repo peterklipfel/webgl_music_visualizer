@@ -7,4 +7,24 @@ $(function() {
 		'bgColor':'#000',
 		'displayPrevious': 'true'
     });
+
+    $("#header").mouseenter(function(){
+	    $(this).animate({
+	        marginTop: "-15px"
+	    }, 100);
+	}).mouseleave(function(){
+	    $(this).animate({
+	        marginTop: "-70px"
+	    }, 100);
+	});
+
+	$("#sidebar").mouseenter(function(){
+	    $(this).animate({
+	        marginRight: "-15px"
+	    }, 100);
+	}).mouseleave(function(){
+	    $(this).animate({
+	        marginRight: "-150px"
+	    }, 100);
+	});
 });
