@@ -562,9 +562,33 @@ function setTrack(trackNum) {
     var tracks = $("#tracks").data("tracks")
     var currentTrack = tracks[parseInt(trackNum)%tracks.length];
     $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
-    console.log(currentTrack["download"]);
     $("#songTitle").text(currentTrack["title"]);
     setTimeout(function(){startWebAudio(); $('#music').trigger("play");}, 4000)
+}
+
+function bindClickEvents(){
+    $('#next').click(
+        function(){
+            $('#music').trigger("pause");
+            currentTrackNum = currentTrackNum + 1;
+            var tracks = $("#tracks").data("tracks")
+            var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
+            $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
+            $("#songTitle").text(currentTrack["title"]);
+            $('#music').trigger("play");
+        }
+    );
+    $('#back').click(
+        function(){
+            $('#music').trigger("pause");
+            currentTrackNum = currentTrackNum - 1;
+            var tracks = $("#tracks").data("tracks")
+            var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
+            $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
+            $("#songTitle").text(currentTrack["title"]);
+            $('#music').trigger("play");
+        }
+    );
 }
 
 
@@ -574,6 +598,7 @@ function webGLStart() {
     canvas.height = window.innerHeight;
     getTracks();
     setTimeout(function(){setTrack(0);}, 3000);
+    bindClickEvents();
 
     initGL(canvas);
     initTextureFrameBuffer();

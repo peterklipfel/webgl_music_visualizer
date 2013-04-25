@@ -29,6 +29,27 @@ body{
 	padding: 40px;
 }
 
+#nav{
+	width: 300px;
+	position: absolute;
+	left: 0;
+	top: 40%;
+}
+
+#next{
+	display: inline;
+	float: right;
+}
+
+#back{
+	display: inline;
+	float: left;
+}
+
+.picker{
+	width: 70px;
+}
+
 .hideable{
 	background-color: rgba(80,80,80,0.35);
 	-webkit-border-radius: 15px;
