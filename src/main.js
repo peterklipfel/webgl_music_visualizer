@@ -517,7 +517,8 @@ function tick() {
     stats.update();
 }
 
-var analyser, canvas, canvasContext;
+var analyser;
+var canvas, canvasContext;
 
 
 function startWebAudio() {
@@ -536,6 +537,8 @@ function startWebAudio() {
 
     // Get the <audio> element started  
     audio.play();
+    var freqByteData = new Uint8Array(analyser.frequencyBinCount);
+    console.log(analyser.getByteFrequencyData(freqByteData));
 }
 
 var currentTrackNum = 0;
@@ -573,14 +576,18 @@ function bindClickEvents(){
             currentTrackNum = currentTrackNum + 1;
             var tracks = $("#tracks").data("tracks")
             var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
-            $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
+            analyser.disconnect();
+            $('#music').remove();
+            $('body').append('<audio id="music" preload="auto" src="'+ currentTrack["download"].toString() + '?client_id=4c6187aeda01c8ad86e556555621074f"></audio>');
             $("#songTitle").text(currentTrack["title"]);
-            $('#music').trigger("play");
+            setTimeout(startWebAudio(), 3000);
+            
+            // setTimeout(function(){$('#music').trigger("play")}, 2000)
         }
     );
     $('#back').click(
         function(){
-            $('#music').trigger("pause");
+            // $('#music').trigger("pause");
             currentTrackNum = currentTrackNum - 1;
             var tracks = $("#tracks").data("tracks")
             var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
@@ -589,6 +596,15 @@ function bindClickEvents(){
             $('#music').trigger("play");
         }
     );
+    $('.suggestion').click(
+        function(){
+            var self = this;
+            $('#music').trigger("pause");
+            $("#music").attr("src", $(self).data().dl);
+            $("#songTitle").text($(self).data().title);
+            $('#music').trigger("play");
+        }
+    )
 }
 
 
