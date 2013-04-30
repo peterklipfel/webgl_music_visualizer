@@ -519,17 +519,18 @@ function tick() {
 
 var analyser;
 var canvas, canvasContext;
-
+var source;
+var audioContext;
 
 function startWebAudio() {
     // Get our <audio> element
     var audio = document.getElementById('music');
     // Create a new audio context (that allows us to do all the Web Audio stuff)
-    var audioContext = new webkitAudioContext();
+    audioContext = new webkitAudioContext();
     // Create a new analyser
     analyser = audioContext.createAnalyser();
     // Create a new audio source from the <audio> element
-    var source = audioContext.createMediaElementSource(audio);
+    source = audioContext.createMediaElementSource(audio);
     // Connect up the output from the audio source to the input of the analyser
     source.connect(analyser);
     // Connect up the audio output of the analyser to the audioContext destination i.e. the speakers (The analyser takes the output of the <audio> element and swallows it. If we want to hear the sound of the <audio> element then we need to re-route the analyser's output to the speakers)
@@ -538,7 +539,6 @@ function startWebAudio() {
     // Get the <audio> element started  
     audio.play();
     var freqByteData = new Uint8Array(analyser.frequencyBinCount);
-    console.log(analyser.getByteFrequencyData(freqByteData));
 }
 
 var currentTrackNum = 0;
@@ -560,6 +560,26 @@ function getTracks(){
         $('#tracks').data("tracks", downloadableTracks);
     });
 }
+var audio;
+function loadSong(url) {
+  if (audio) audio.remove();
+  if (source) source.disconnect();
+  audio = new Audio();
+  audio.src = url;
+  audio.addEventListener("canplay", function(e) {
+    setupAudioNodes();
+  }, false);
+}
+
+function setupAudioNodes() {
+  analyser = (analyser || audioContext.createAnalyser());
+  // analyser.smoothingTimeConstant = 0.8;
+  // analyser.fftSize = 512;
+
+  source = audioContext.createMediaElementSource(audio);
+  source.connect(analyser);
+  source.connect(audioContext.destination);
+  }
 
 function setTrack(trackNum) {
     var tracks = $("#tracks").data("tracks")
@@ -597,14 +617,34 @@ function bindClickEvents(){
         }
     );
     $('.suggestion').click(
-        function(){
+        //         function(e){
+        //     e.preventDefault()
+        //     var self = this;
+        //     $('#music').trigger("pause");
+        //     $("#music").attr("src", $(self).data().dl);
+        //     $("#songTitle").text($(self).data().title);
+        //     $('#music').trigger("play");
+        // }
+
+        function(e){
+            e.preventDefault();
             var self = this;
-            $('#music').trigger("pause");
-            $("#music").attr("src", $(self).data().dl);
             $("#songTitle").text($(self).data().title);
-            $('#music').trigger("play");
+            var path = $(this).data().dl;
+            if (audio) audio.remove();
+            if (source) source.disconnect();
+            audio = new Audio();
+            audio.src = path;
+            audio.addEventListener("canplay", function(e) {
+                analyser = (analyser || audioContext.createAnalyser());
+
+                source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                source.connect(audioContext.destination);
+                audio.play();
+            }, false);
         }
-    )
+    );
 }
 
 
