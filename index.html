@@ -74,11 +74,20 @@
         if(rgb.r < uRedSensitivity){
           r = 0.0;
         }
+        else{
+          r = r+uAmplitude;
+        }
         if(rgb.g < uGreenSensitivity){
           g = 0.0;
         }
+        else{
+          g = r+uAmplitude;
+        }
         if(rgb.b < uBlueSensitivity){
           b = 0.0;
+        }
+        else{
+          b = r+uAmplitude;
         }
 
         gl_FragColor = vec4(r, g, b, 1.0);
@@ -118,6 +127,10 @@
         <div>
             <h5>Blue Sensitivity</h5>
             <input type="text" class="dial" id="bSens" data-min="0" data-max="100" value="40"/>
+        </div>
+        <div>
+            <h5>Total Sensitivity</h5>
+            <input type="text" class="dial" id="tSens" data-min="0" data-max="50" value="40"/>
         </div>
     </div>
     <div class="hideable" id="nav">

@@ -487,7 +487,8 @@ function animate() {
     for (var i = 0; i < freqByteData.length; i++) {
         amplitude = amplitude + freqByteData[i];
     }
-    amplitude = (amplitude/freqByteData.length)/150.0
+    amplitude = (amplitude/freqByteData.length)/((($('#tSens').val()+40)*10))
+    console.log(amplitude);
     gl.uniform1f(shaderToScreenProgram.amplitudeUniform ,amplitude)
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
