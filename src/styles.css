@@ -30,10 +30,15 @@ body{
 }
 
 #nav{
-	width: 300px;
+	width: 325px;
 	position: absolute;
 	left: 0;
 	top: 40%;
+	margin-left: -15px;
+}
+
+.suggestion{
+	margin-left: 25px;
 }
 
 #next{
@@ -44,6 +49,7 @@ body{
 #back{
 	display: inline;
 	float: left;
+	margin-left: 10px;
 }
 
 .picker{

@@ -27,4 +27,14 @@ $(function() {
 	        marginRight: "-150px"
 	    }, 100);
 	});
+
+	$("#nav").mouseenter(function(){
+	    $(this).animate({
+	        marginLeft: "-15px"
+	    }, 100);
+	}).mouseleave(function(){
+	    $(this).animate({
+	        marginLeft: "-305px"
+	    }, 100);
+	});
 });
