@@ -562,24 +562,19 @@ function getTracks(){
 }
 var audio;
 function loadSong(url) {
-  if (audio) audio.remove();
-  if (source) source.disconnect();
-  audio = new Audio();
-  audio.src = url;
-  audio.addEventListener("canplay", function(e) {
-    setupAudioNodes();
-  }, false);
+    if (audio) audio.remove();
+    if (source) source.disconnect();
+    audio = new Audio();
+    audio.src = url;
+    audio.addEventListener("canplay", function(e) {
+        analyser = (analyser || audioContext.createAnalyser());
+
+        source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        source.connect(audioContext.destination);
+        audio.play();
+    }, false);
 }
-
-function setupAudioNodes() {
-  analyser = (analyser || audioContext.createAnalyser());
-  // analyser.smoothingTimeConstant = 0.8;
-  // analyser.fftSize = 512;
-
-  source = audioContext.createMediaElementSource(audio);
-  source.connect(analyser);
-  source.connect(audioContext.destination);
-  }
 
 function setTrack(trackNum) {
     var tracks = $("#tracks").data("tracks")
@@ -591,58 +586,36 @@ function setTrack(trackNum) {
 
 function bindClickEvents(){
     $('#next').click(
-        function(){
-            $('#music').trigger("pause");
+        function(e){
+            e.preventDefault();
             currentTrackNum = currentTrackNum + 1;
             var tracks = $("#tracks").data("tracks")
             var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
-            analyser.disconnect();
-            $('#music').remove();
-            $('body').append('<audio id="music" preload="auto" src="'+ currentTrack["download"].toString() + '?client_id=4c6187aeda01c8ad86e556555621074f"></audio>');
+            var self = this;
             $("#songTitle").text(currentTrack["title"]);
-            setTimeout(startWebAudio(), 3000);
-            
-            // setTimeout(function(){$('#music').trigger("play")}, 2000)
+            var path = currentTrack["download"].toString() + '?client_id=4c6187aeda01c8ad86e556555621074f';
+            loadSong(path);
         }
     );
     $('#back').click(
-        function(){
-            // $('#music').trigger("pause");
+        function(e){
+            e.preventDefault();
             currentTrackNum = currentTrackNum - 1;
             var tracks = $("#tracks").data("tracks")
             var currentTrack = tracks[parseInt(currentTrackNum)%tracks.length];
-            $("#music").attr("src", currentTrack["download"].toString() + "?client_id=4c6187aeda01c8ad86e556555621074f");
+            var self = this;
             $("#songTitle").text(currentTrack["title"]);
-            $('#music').trigger("play");
+            var path = currentTrack["download"].toString() + '?client_id=4c6187aeda01c8ad86e556555621074f';
+            loadSong(path);
         }
     );
     $('.suggestion').click(
-        //         function(e){
-        //     e.preventDefault()
-        //     var self = this;
-        //     $('#music').trigger("pause");
-        //     $("#music").attr("src", $(self).data().dl);
-        //     $("#songTitle").text($(self).data().title);
-        //     $('#music').trigger("play");
-        // }
-
         function(e){
             e.preventDefault();
             var self = this;
             $("#songTitle").text($(self).data().title);
             var path = $(this).data().dl;
-            if (audio) audio.remove();
-            if (source) source.disconnect();
-            audio = new Audio();
-            audio.src = path;
-            audio.addEventListener("canplay", function(e) {
-                analyser = (analyser || audioContext.createAnalyser());
-
-                source = audioContext.createMediaElementSource(audio);
-                source.connect(analyser);
-                source.connect(audioContext.destination);
-                audio.play();
-            }, false);
+            loadSong(path);
         }
     );
 }
