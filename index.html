@@ -1,4 +1,3 @@
-
 <html>
 
 <head>
@@ -81,13 +80,13 @@
           g = 0.0;
         }
         else{
-          g = r+uAmplitude;
+          g = g+uAmplitude;
         }
         if(rgb.b < uBlueSensitivity){
           b = 0.0;
         }
         else{
-          b = r+uAmplitude;
+          b = b+uAmplitude;
         }
 
         gl_FragColor = vec4(r, g, b, 1.0);
